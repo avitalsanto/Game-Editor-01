@@ -325,7 +325,7 @@ body[data-skin="iphone"] .overlay .stats span{color:#58a6ff}
 body[data-skin="iphone"] .game-btn{background:linear-gradient(180deg,#2563eb,#1d4ed8);box-shadow:0 2px 12px rgba(37,99,235,.4),inset 0 1px 0 rgba(255,255,255,.1)}
 body[data-skin="iphone"] .float-score.good{color:#6bff8e}
 body[data-skin="iphone"] .float-score.great{color:#58a6ff}
-body[data-skin="iphone"] .facade{background:radial-gradient(ellipse at 50% 45%,rgba(22,22,35,.5) 0%,transparent 55%),linear-gradient(180deg,#08080e,#0c0c16 30%,#0a0a12 65%,#060610);padding:clamp(44px,7vmin,72px) clamp(10px,2vmin,28px) clamp(8px,1.5vmin,24px)}
+body[data-skin="iphone"] .facade{background:radial-gradient(ellipse at 50% 45%,rgba(22,22,35,.5) 0%,transparent 55%),linear-gradient(180deg,#08080e,#0c0c16 30%,#0a0a12 65%,#060610);padding:clamp(54px,8vmin,76px) clamp(10px,2vmin,28px) clamp(12px,2vmin,24px)}
 .iphone{position:relative;overflow:visible;z-index:1;cursor:pointer;transition:transform .2s;aspect-ratio:9/19}
 .iphone:active{transform:scale(.97)}
 .phone-body{position:absolute;inset:0;border-radius:18%;z-index:0;background:linear-gradient(165deg,#3a3a42,#2e2e36 8%,#4a4a54 15%,#3e3e48 25%,#36363e 40%,#3a3a44 55%,#32323c 70%,#3e3e48 85%,#2e2e36);box-shadow:0 4px 24px rgba(0,0,0,.6),0 8px 48px rgba(0,0,0,.3),0 0 0 1px rgba(80,80,90,.3),inset 0 0 0 1.5px rgba(70,70,80,.4),inset 0 1px 0 rgba(255,255,255,.06);transition:box-shadow .35s}
@@ -637,7 +637,7 @@ function computeGrid(){
   else if(skin==='washing'){winW=isMobile?80:132;winH=Math.round(winW*1.25);gapX=Math.round(winW*.16);gapY=Math.round(winH*.12)}
   else if(skin==='museum'){winW=isMobile?48:132;winH=Math.round(winW*1.33);gapX=Math.round(winW*(isMobile?.9:.55));gapY=Math.round(winH*(isMobile?.8:.4))}
   else if(skin==='tv'){winW=isMobile?78:168;winH=Math.round(winW*.8);gapX=Math.round(winW*(isMobile?.3:.18));gapY=Math.round(winH*(isMobile?.35:.25))}
-  else if(skin==='iphone'){winW=isMobile?62:96;winH=Math.round(winW*2.1);gapX=Math.round(winW*.22);gapY=Math.round(winH*.08)}
+  else if(skin==='iphone'){winW=isMobile?56:96;winH=Math.round(winW*2.1);gapX=Math.round(winW*.22);gapY=Math.round(winH*.08)}
   else if(skin==='eye'){winW=isMobile?72:110;winH=winW;gapX=Math.round(winW*.25);gapY=Math.round(winH*.25)}
   let cols=Math.max(minCols,Math.floor((availW+gapX)/(winW+gapX)));
   if(skin==='museum'&&isMobile)cols=Math.min(cols,3);
