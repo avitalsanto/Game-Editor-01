@@ -32,6 +32,10 @@ a,button,input,textarea{-webkit-tap-highlight-color:transparent}
 .editor-topbar-actions{display:flex;gap:8px}
 .editor-topbar .e-btn{padding:8px 18px;font-size:clamp(12px,1.5vmin,14px);min-height:36px;border-radius:8px}
 .editor-topbar .e-btn-start{padding:8px 22px}
+.editor-topbar .e-btn-share{background:rgba(124,58,237,.12);color:#a78bfa;border:1px solid rgba(124,58,237,.2)}
+.editor-topbar .e-btn-share:hover{background:rgba(124,58,237,.22)}
+.share-toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#1e1e2e;color:#e8e4f8;padding:12px 24px;border-radius:10px;font-size:14px;z-index:9999;opacity:0;transition:all .3s ease;pointer-events:none;border:1px solid rgba(124,58,237,.2);box-shadow:0 4px 20px rgba(0,0,0,.4)}
+.share-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .editor-header{text-align:center;padding:clamp(8px,1.5vmin,16px) 0 clamp(10px,1.5vmin,16px)}
 .editor-header p{font-size:clamp(12px,1.5vmin,14px);color:#5a5e74}
 .editor-body{display:flex;flex-direction:column;gap:0}
@@ -50,10 +54,11 @@ a,button,input,textarea{-webkit-tap-highlight-color:transparent}
 .asset-item{min-width:0}
 .asset-item label{display:block;font-size:clamp(11px,1.4vmin,13px);color:#7a7e94;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .asset-preview{width:100%;aspect-ratio:1;border-radius:10px;object-fit:cover;background:#12121e;margin-bottom:6px;border:1px solid rgba(255,255,255,.05)}
-.asset-btns{display:flex;gap:6px}
-.upload-btn{display:flex;align-items:center;justify-content:center;flex:1;padding:8px 6px;font-size:13px;border:1px dashed rgba(255,255,255,.1);background:rgba(255,255,255,.02);border-radius:8px;color:#6a6e84;cursor:pointer;text-align:center;min-height:40px;font-family:inherit;transition:background .2s}
+.asset-btns{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.asset-btns.single{grid-template-columns:1fr}
+.upload-btn{display:flex;align-items:center;justify-content:center;padding:8px 6px;font-size:13px;border:1px dashed rgba(255,255,255,.1);background:rgba(255,255,255,.02);border-radius:8px;color:#6a6e84;cursor:pointer;text-align:center;height:40px;font-family:inherit;transition:background .2s}
 .upload-btn:hover{background:rgba(255,255,255,.06)}
-.del-btn{padding:8px 10px;font-size:12px;border:1px solid rgba(255,80,80,.15);background:rgba(255,60,60,.06);border-radius:8px;color:#e06060;cursor:pointer;font-family:inherit;min-height:40px;transition:background .2s}
+.del-btn{display:flex;align-items:center;justify-content:center;padding:8px 6px;font-size:13px;border:1px solid rgba(255,80,80,.15);background:rgba(255,60,60,.06);border-radius:8px;color:#e06060;cursor:pointer;font-family:inherit;height:40px;transition:background .2s}
 .del-btn:hover{background:rgba(255,60,60,.15)}
 input[type="file"]{display:none}
 .field-group{margin-bottom:12px}
@@ -84,10 +89,10 @@ input[type="file"]{display:none}
 .hud-item{display:flex;align-items:center;gap:5px}
 .hud-value{font-weight:bold;font-size:1.2em;min-width:1.2em;text-align:center}
 .timer-bar-wrap{position:fixed;top:40px;left:clamp(14px,3.5vmin,36px);right:clamp(14px,3.5vmin,36px);height:5px;border-radius:3px;z-index:100;overflow:hidden;pointer-events:none}
-.timer-bar{height:100%;background:linear-gradient(to right,#e06848,#f0c850,#4ae068);border-radius:3px;width:100%;transition:width .3s linear}
-.timer-bar.urgent{background:linear-gradient(to right,#ff3333,#e06848);animation:pulse-bar .5s ease infinite alternate}
+.timer-bar{height:100%;background:linear-gradient(to right,#a0a0a0,#e0e0e0);border-radius:3px;width:100%;transition:width .3s linear}
+.timer-bar.urgent{background:linear-gradient(to right,#666,#999);animation:pulse-bar .5s ease infinite alternate}
 @keyframes pulse-bar{from{opacity:.7}to{opacity:1}}
-.combo{position:fixed;top:52px;left:50%;transform:translateX(-50%);z-index:101;font-size:clamp(16px,3vmin,26px);font-weight:bold;opacity:0;transition:opacity .3s;pointer-events:none}
+.combo{position:fixed;top:52px;left:50%;transform:translateX(-50%);z-index:101;font-size:clamp(16px,3vmin,26px);font-weight:bold;opacity:0;transition:opacity .3s;pointer-events:none;display:none}
 .combo.visible{opacity:1}
 .overlay{position:fixed;top:0;left:0;width:100vw;height:100vh;height:100dvh;z-index:9999;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;gap:14px;transition:opacity .4s ease;padding:20px}
 .overlay.hidden{opacity:0;pointer-events:none;z-index:-1}
@@ -127,8 +132,7 @@ body[data-skin="building"] .facade::before{content:'';position:absolute;inset:0;
 .window-frame{position:absolute;inset:-6px;background:linear-gradient(170deg,#46427a,#3a366a 50%,#332f5e);border-radius:4px;z-index:0;transition:box-shadow .35s;box-shadow:inset 0 1px 0 rgba(255,255,255,.06),inset 0 -1px 0 rgba(0,0,0,.15),0 2px 6px rgba(0,0,0,.3),0 4px 12px rgba(0,0,0,.15)}
 .window.lit .window-frame{box-shadow:0 0 18px var(--win-glow),0 0 45px var(--win-glow),inset 0 1px 0 rgba(255,255,255,.06),0 2px 6px rgba(0,0,0,.3)}
 .window-glass{position:relative;width:100%;height:100%;background:#13112a;border-radius:2px;overflow:hidden;z-index:1;transition:background-color .35s;box-shadow:inset 0 2px 8px rgba(0,0,0,.5),inset 0 0 3px rgba(0,0,0,.3)}
-.window.lit .window-glass{background:var(--win-color);animation:light-flicker .7s ease-out}
-@keyframes light-flicker{0%{filter:brightness(0)}5%{filter:brightness(1.5)}9%{filter:brightness(.15)}14%{filter:brightness(1.3)}19%{filter:brightness(.3)}25%{filter:brightness(1.2)}32%{filter:brightness(.55)}40%{filter:brightness(1.1)}50%{filter:brightness(.8)}60%{filter:brightness(1.05)}100%{filter:brightness(1)}}
+.window.lit .window-glass{background:var(--win-color)}
 .window .animal-img{position:absolute;inset:5%;width:90%;height:90%;object-fit:cover;border-radius:2px;z-index:2;opacity:0;transition:opacity .35s;pointer-events:none}
 .window.lit .animal-img{opacity:1}
 .window .color-tint{position:absolute;inset:0;z-index:3;opacity:0;transition:opacity .35s;background:var(--win-color);pointer-events:none}
@@ -277,7 +281,7 @@ body[data-skin="tv"] .facade::after{content:'';position:absolute;inset:0;pointer
 .tv-antenna::before,.tv-antenna::after{content:'';position:absolute;bottom:0;width:1.5px;height:9px;background:linear-gradient(to top,#888,#aaa);border-radius:1px 1px 0 0;opacity:.6}
 .tv-antenna::before{left:20%;transform:rotate(-18deg);transform-origin:bottom center}
 .tv-antenna::after{right:20%;transform:rotate(18deg);transform-origin:bottom center}
-.tv-bezel{position:absolute;top:8%;left:5%;right:28%;bottom:10%;background:#0a0a0a;border-radius:10px;z-index:2;box-shadow:inset 0 3px 12px rgba(0,0,0,.8),inset 0 -2px 6px rgba(0,0,0,.5),0 0 0 2px rgba(40,28,18,.8);overflow:hidden}
+.tv-bezel{position:absolute;top:5%;left:5%;right:28%;bottom:5%;background:#0a0a0a;border-radius:10px;z-index:2;box-shadow:inset 0 3px 12px rgba(0,0,0,.8),inset 0 -2px 6px rgba(0,0,0,.5),0 0 0 2px rgba(40,28,18,.8);overflow:hidden}
 .tv-screen{position:absolute;inset:4px;border-radius:7px;background:radial-gradient(ellipse at 48% 45%,#1a1e22,#111418,#0a0c10);overflow:hidden;z-index:1;transition:background .35s}
 .tv.lit .tv-screen{background:radial-gradient(ellipse at 48% 45%,var(--tv-color),color-mix(in srgb,var(--tv-color),#000 40%));animation:reception-glitch .55s ease-out}
 @keyframes reception-glitch{0%{transform:translateX(0) skewX(0);filter:brightness(.1)}4%{transform:translateX(-8px) skewX(-2.5deg);filter:saturate(4) hue-rotate(35deg) brightness(1.6)}8%{transform:translateX(6px) skewX(2deg);filter:saturate(.1) brightness(.3)}13%{transform:translateX(-5px) skewX(-1.5deg);filter:hue-rotate(-30deg) brightness(1.5)}18%{transform:translateX(4px) skewX(1deg);filter:saturate(2.5) brightness(.7)}32%{transform:translateX(1px) skewX(0);filter:brightness(1.1)}42%,100%{transform:translateX(0) skewX(0);filter:none}}
@@ -290,7 +294,7 @@ body[data-skin="tv"] .facade::after{content:'';position:absolute;inset:0;pointer
 .tv.lit .color-tint{opacity:.1}
 .tv .inner-glow{position:absolute;inset:0;z-index:5;border-radius:7px;opacity:0;transition:opacity .35s;background:radial-gradient(ellipse at 45% 35%,rgba(255,255,255,.06) 0%,transparent 55%);pointer-events:none}
 .tv.lit .inner-glow{opacity:1}
-.tv-controls{position:absolute;top:8%;right:3%;bottom:10%;width:19%;z-index:2;pointer-events:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10%}
+.tv-controls{position:absolute;top:5%;right:3%;bottom:5%;width:19%;z-index:2;pointer-events:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10%}
 .tv-knob{width:55%;aspect-ratio:1;border-radius:50%;background:conic-gradient(from 150deg,#888,#aaa,#777,#999,#888);box-shadow:0 2px 4px rgba(0,0,0,.4),inset 0 1px 2px rgba(255,255,255,.2);position:relative;flex-shrink:0}
 .tv-knob::after{content:'';position:absolute;width:2px;height:35%;top:10%;left:50%;transform:translateX(-50%) rotate(30deg);background:#555;border-radius:2px}
 .tv-knob:nth-child(2){width:42%}
@@ -430,18 +434,20 @@ window.onerror = function(msg,url,line){alert('Error line '+line+': '+msg)};
 
 const DEFAULT_CAT = 'https://static.wixstatic.com/media/b4f4e1_abe64ef20b284ee6b4f7fad81e35ff09~mv2.jpg';
 const DEFAULT_DOG = 'https://static.wixstatic.com/media/b4f4e1_e5ffad3b90b44024ad2beed91804dac8~mv2.jpg';
-const GAME_DURATION = 60;
+const DEFAULT_DOG2 = 'https://static.wixstatic.com/media/b4f4e1_eef9ea7fc42c4207a169bd9d864a8ed0~mv2.png';
+const DEFAULT_DOG3 = 'https://static.wixstatic.com/media/b4f4e1_1115541aad734962ae2ecbb0e7653b71~mv2.png';
+const GAME_DURATION = 45;
 
 const STATE = {
   mode: 'welcome',
   skin: 'building',
   difficulty: 'hard',
-  assets: { cat: DEFAULT_CAT, dogs: [DEFAULT_DOG, DEFAULT_DOG, DEFAULT_DOG] },
+  assets: { cat: DEFAULT_CAT, dogs: [DEFAULT_DOG, DEFAULT_DOG2, DEFAULT_DOG3] },
   texts: {
     startTitle: 'מי מציץ!',
     startBody: 'מצא את מי שמציץ כמה שיותר מהר!\nאבל היזהר מהמלכודות — לחיצה על הלא נכון = פסילה!',
     winMsg: 'דיוק מטורף!!!',
-    loseMsg: 'לחצת על הלא נכון! רק חיוביים!',
+    loseMsg: 'באסה. אולי בפעם הבאה',
     failMsg: 'צריך לתרגל עוד קצת...'
   }
 };
@@ -498,10 +504,11 @@ function renderEditor(){
   for(let i=0;i<3;i++){
     const src=STATE.assets.dogs[i]||'';
     const hasImg=!!src;
-    dogSlots+=`<div class="asset-item"><label>שלילית ${i+1}</label>${hasImg?`<img class="asset-preview" src="${src}"/>`:`<div class="asset-preview"></div>`}<div class="asset-btns"><label class="upload-btn" for="dogFile${i}">${hasImg?'החלף':'העלה'}</label>${hasImg&&i>0?`<button class="del-btn" data-del-dog="${i}">מחק</button>`:''}</div><input type="file" id="dogFile${i}" accept="image/*" data-dog="${i}"/></div>`;
+    const showDel=hasImg&&i>0;
+    dogSlots+=`<div class="asset-item"><label>שלילית ${i+1}</label>${hasImg?`<img class="asset-preview" src="${src}"/>`:`<div class="asset-preview"></div>`}<div class="asset-btns${showDel?'':' single'}"><label class="upload-btn" for="dogFile${i}">${hasImg?'החלף':'העלה'}</label>${showDel?`<button class="del-btn" data-del-dog="${i}">מחק</button>`:''}</div><input type="file" id="dogFile${i}" accept="image/*" data-dog="${i}"/></div>`;
   }
   return `<div id="editorScreen" style="display:block">
-<div class="editor-topbar"><h2>עורך המשחק</h2><div class="editor-topbar-actions"><button class="e-btn e-btn-back" id="edBackBtn">חזרה</button><button class="e-btn e-btn-start" id="edStartBtn">התחל משחק</button></div></div>
+<div class="editor-topbar"><h2>עורך המשחק</h2><div class="editor-topbar-actions"><button class="e-btn e-btn-share" id="edShareBtn">שתף</button><button class="e-btn e-btn-back" id="edBackBtn">חזרה</button><button class="e-btn e-btn-start" id="edStartBtn">התחל משחק</button></div></div>
 <div class="editor-header"><p>התאם את המשחק שלך</p></div>
 <div class="editor-body">
 <div class="editor-section sec-skin"><h3>עיצוב</h3><div class="skin-grid">${skinCards}</div></div>
@@ -519,6 +526,7 @@ function bindEditor(){
   document.querySelectorAll('.diff-btn').forEach(b=>b.onclick=()=>{saveTexts();STATE.difficulty=b.dataset.diff;render()});
   document.getElementById('edBackBtn').onclick=()=>{saveTexts();STATE.mode='welcome';render()};
   document.getElementById('edStartBtn').onclick=()=>{saveTexts();STATE.mode='game';render()};
+  document.getElementById('edShareBtn').onclick=()=>{saveTexts();shareGame()};
 }
 
 function saveTexts(){
@@ -535,6 +543,43 @@ function handleUpload(e,cb){
   const r=new FileReader();r.onload=ev=>cb(ev.target.result);r.readAsDataURL(f);
 }
 
+function shareGame(){
+  saveTexts();
+  const shareData={skin:STATE.skin,difficulty:STATE.difficulty,texts:STATE.texts,assets:{cat:STATE.assets.cat,dogs:STATE.assets.dogs.filter(d=>d)}};
+  const encoded=btoa(unescape(encodeURIComponent(JSON.stringify(shareData))));
+  const url=location.origin+location.pathname+'#g='+encoded;
+  if(navigator.share){
+    navigator.share({title:STATE.texts.startTitle,text:STATE.texts.startBody,url}).catch(()=>{});
+  } else {
+    navigator.clipboard.writeText(url).then(()=>showToast('הלינק הועתק')).catch(()=>{
+      const ta=document.createElement('textarea');ta.value=url;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();showToast('הלינק הועתק');
+    });
+  }
+}
+
+function showToast(msg){
+  let t=document.querySelector('.share-toast');
+  if(!t){t=document.createElement('div');t.className='share-toast';document.body.appendChild(t)}
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+function loadFromHash(){
+  const h=location.hash;if(!h||!h.startsWith('#g='))return false;
+  try{
+    const json=JSON.parse(decodeURIComponent(escape(atob(h.slice(3)))));
+    if(json.skin)STATE.skin=json.skin;
+    if(json.difficulty)STATE.difficulty=json.difficulty;
+    if(json.texts)Object.assign(STATE.texts,json.texts);
+    if(json.assets){
+      if(json.assets.cat)STATE.assets.cat=json.assets.cat;
+      if(json.assets.dogs)STATE.assets.dogs=json.assets.dogs;
+    }
+    STATE.mode='game';
+    return true;
+  }catch(e){return false}
+}
+
 function renderGame(){
   const sm=SKIN_META[STATE.skin];
   return `<div id="gameScreen" style="display:block"><button class="back-to-editor" id="backBtn">← עריכה</button>
@@ -543,7 +588,7 @@ function renderGame(){
 <div class="combo" id="combo"></div>
 <div class="facade" id="facade"></div></div>
 <div class="overlay" id="startScreen"><h1>${STATE.texts.startTitle} ${sm.icon}</h1><p>${STATE.texts.startBody.replace(/\n/g,'<br>')}</p><button class="game-btn" id="gameStartBtn">▶ התחל!</button></div>
-<div class="overlay hidden" id="endScreen"><h1 id="endTitle">נגמר הזמן!</h1><div class="final-score" id="finalScore">0</div><div class="stats"><div>תפיסות: <span id="statCatches">0</span></div><div>ברחו: <span id="statMisses">0</span></div><div>שיא קומבו: <span id="statCombo">0</span></div></div><p id="endMsg"></p><button class="game-btn" id="retryBtn">▶ שחק שוב!</button></div>`;
+<div class="overlay hidden" id="endScreen"><h1 id="endTitle">נגמר הזמן!</h1><div class="final-score" id="finalScore">0</div><div class="stats"><div>תפיסות: <span id="statCatches">0</span></div><div>ברחו: <span id="statMisses">0</span></div></div><p id="endMsg"></p><button class="game-btn" id="retryBtn">▶ שחק שוב!</button></div>`;
 }
 
 function bindGame(){
@@ -568,7 +613,7 @@ function computeGrid(){
   const isMobile=rect.width<500;
   const skin=STATE.skin;
   let winW,winH,gapX,gapY,minCols=2;
-  if(skin==='building'){winW=isMobile?70:120;winH=Math.round(winW*1.3);gapX=Math.round(winW*.6);gapY=Math.round(winH*.5);minCols=3}
+  if(skin==='building'){winW=isMobile?63:108;winH=Math.round(winW*1.3);gapX=Math.round(winW*.6);gapY=Math.round(winH*.5);minCols=3}
   else if(skin==='washing'){winW=isMobile?80:132;winH=Math.round(winW*1.25);gapX=Math.round(winW*.16);gapY=Math.round(winH*.12)}
   else if(skin==='museum'){winW=isMobile?48:132;winH=Math.round(winW*1.33);gapX=Math.round(winW*(isMobile?.9:.55));gapY=Math.round(winH*(isMobile?.8:.4))}
   else if(skin==='tv'){winW=isMobile?78:168;winH=Math.round(winW*.8);gapX=Math.round(winW*(isMobile?.3:.18));gapY=Math.round(winH*(isMobile?.35:.25))}
@@ -587,10 +632,10 @@ function buildElementHTML(skin,catImg,dogImg,cs){
     return `<div class="machine-body"></div><div class="machine-panel"><div class="panel-knob"></div><div class="panel-knob"></div><div class="panel-leds"><div class="panel-led"></div><div class="panel-led"></div><div class="panel-led"></div></div></div><div class="door-ring"><div class="door-glass"><img class="animal-img cat" src="${catImg}" alt="" loading="eager"/><img class="animal-img dog" src="${dogImg}" alt="" loading="eager" style="display:none"/><div class="color-tint"></div><div class="inner-glow"></div><div class="glass-shine"></div></div></div><div class="door-handle"></div>`;
   }
   if(skin==='museum'){
-    return `<div class="frame-outer"><div class="frame-inner-ridge"></div><div class="frame-corner corner-tl"></div><div class="frame-corner corner-tr"></div><div class="frame-corner corner-bl"></div><div class="frame-corner corner-br"></div></div><div class="frame-mat"></div><div class="frame-canvas"><img class="animal-img cat" src="${catImg}" alt="" loading="eager"/><img class="animal-img dog" src="${dogImg}" alt="" loading="eager" style="display:none"/><div class="color-tint"></div><div class="canvas-texture"></div></div><div class="spotlight"></div><div class="wall-light"></div><div class="plaque"></div>`;
+    return `<div class="frame-outer"><div class="frame-inner-ridge"></div><div class="frame-corner corner-tl"></div><div class="frame-corner corner-tr"></div><div class="frame-corner corner-bl"></div><div class="frame-corner corner-br"></div></div><div class="frame-mat"></div><div class="frame-canvas"><img class="animal-img cat" src="${catImg}" alt="" loading="eager"/><img class="animal-img dog" src="${dogImg}" alt="" loading="eager" style="display:none"/><div class="color-tint"></div><div class="canvas-texture"></div></div><div class="spotlight"></div>`;
   }
   if(skin==='tv'){
-    return `<div class="tv-body"></div><div class="tv-antenna"></div><div class="tv-bezel"><div class="tv-screen"><img class="animal-img cat" src="${catImg}" alt="" loading="eager"/><img class="animal-img dog" src="${dogImg}" alt="" loading="eager" style="display:none"/><div class="color-tint"></div><div class="inner-glow"></div><div class="tv-scanlines"></div><div class="tv-glare"></div></div></div><div class="tv-controls"><div class="tv-knob"></div><div class="tv-knob"></div></div><div class="tv-speaker"></div><div class="tv-led"></div><div class="tv-brand">RETRO</div><div class="tv-ambient"></div>`;
+    return `<div class="tv-body"></div><div class="tv-antenna"></div><div class="tv-bezel"><div class="tv-screen"><img class="animal-img cat" src="${catImg}" alt="" loading="eager"/><img class="animal-img dog" src="${dogImg}" alt="" loading="eager" style="display:none"/><div class="color-tint"></div><div class="inner-glow"></div><div class="tv-scanlines"></div><div class="tv-glare"></div></div></div><div class="tv-controls"><div class="tv-knob"></div><div class="tv-knob"></div></div><div class="tv-ambient"></div>`;
   }
   if(skin==='iphone'){
     return `<div class="phone-body"></div><div class="btn-side-l"></div><div class="btn-vol-up"></div><div class="btn-vol-down"></div><div class="btn-power"></div><div class="screen-edge"></div><div class="screen-area"><div class="ip-screen"><img class="animal-img cat" src="${catImg}" alt="" loading="eager"/><img class="animal-img dog" src="${dogImg}" alt="" loading="eager" style="display:none"/><div class="color-tint"></div><div class="ip-screen-glare"></div></div><div class="dynamic-island"></div><div class="status-bar"><div class="status-time">9:41</div><div class="status-icons"><div class="status-icon"></div><div class="status-icon"></div><div class="status-icon battery"></div></div></div><div class="home-indicator"></div></div><div class="screen-ambient"></div>`;
@@ -749,7 +794,8 @@ let resizeTimer;function onResize(){clearTimeout(resizeTimer);resizeTimer=setTim
 window.addEventListener('resize',onResize);
 if(window.visualViewport)window.visualViewport.addEventListener('resize',onResize);
 
-new Image().src=DEFAULT_CAT;new Image().src=DEFAULT_DOG;
+new Image().src=DEFAULT_CAT;new Image().src=DEFAULT_DOG;new Image().src=DEFAULT_DOG2;new Image().src=DEFAULT_DOG3;
+loadFromHash();
 render();
 </script>
 </body>
